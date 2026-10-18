@@ -14,6 +14,19 @@ extension UIView {
         padding: CGFloat = 0,
         respectingSafeArea: Bool = false
     ) {
+        addSubviewContained(
+            subview,
+            insets: UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding),
+            respectingSafeArea: respectingSafeArea
+        )
+    }
+
+    /// Same as above, with a different inset per edge.
+    func addSubviewContained(
+        _ subview: UIView,
+        insets: UIEdgeInsets,
+        respectingSafeArea: Bool = false
+    ) {
         subview.translatesAutoresizingMaskIntoConstraints = false
         addSubview(subview)
         
@@ -36,10 +49,10 @@ extension UIView {
         }
         
         NSLayoutConstraint.activate([
-            subview.topAnchor.constraint(equalTo: top, constant: padding),
-            subview.bottomAnchor.constraint(equalTo: bottom, constant: -padding),
-            subview.leadingAnchor.constraint(equalTo: leading, constant: padding),
-            subview.trailingAnchor.constraint(equalTo: trailing, constant: -padding)
+            subview.topAnchor.constraint(equalTo: top, constant: insets.top),
+            subview.bottomAnchor.constraint(equalTo: bottom, constant: -insets.bottom),
+            subview.leadingAnchor.constraint(equalTo: leading, constant: insets.left),
+            subview.trailingAnchor.constraint(equalTo: trailing, constant: -insets.right)
         ])
     }
 }

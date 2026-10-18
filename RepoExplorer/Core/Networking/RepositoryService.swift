@@ -19,8 +19,9 @@ final class RepositoryService: RepositoryServicing {
         self.client = client
     }
 
+    // Most recently pushed first, so the latest work shows at the top.
     func fetchRepositories(for user: String) async throws -> [Repository] {
-        guard let url = URL(string: "https://api.github.com/users/\(user)/repos") else {
+        guard let url = URL(string: "https://api.github.com/users/\(user)/repos?sort=pushed&per_page=100") else {
             throw NetworkError.invalidURL
         }
         return try await client.request(url)

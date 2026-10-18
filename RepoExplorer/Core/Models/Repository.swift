@@ -13,6 +13,7 @@ struct Repository: Decodable {
     let stargazersCount: Int
     let forksCount: Int
     let language: String?
+    let htmlUrl: URL
     let owner: Owner
     
     struct Owner: Decodable {

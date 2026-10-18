@@ -20,20 +20,21 @@ final class NetworkClient: NetworkClientProtocol {
     init(session: URLSession = .shared) {
         self.session = session
 
-        // GitHub uses snake_case, our models use camelCase.
-        // This spares us from writing CodingKeys by hand.
+        // GitHub uses snake_case and ISO 8601 dates, our models use camelCase and Date.
+        // This spares us from writing CodingKeys and date parsing by hand.
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
+        decoder.dateDecodingStrategy = .iso8601
         self.decoder = decoder
     }
 
     func request<T: Decodable>(_ url: URL) async throws -> T {
         let (data, response) = try await session.data(from: url)
 
-        // Treat anything outside 2xx as a failure.
-        guard let http = response as? HTTPURLResponse,
-              (200...299).contains(http.statusCode) else {
-            throw NetworkError.invalidResponse
+        // Treat anything outside 2xx as a failure, keeping the status code for the caller.
+        let statusCode = (response as? HTTPURLResponse)?.statusCode
+        guard let statusCode, (200...299).contains(statusCode) else {
+            throw NetworkError.invalidResponse(statusCode: statusCode)
         }
 
         do {

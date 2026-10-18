@@ -26,19 +26,27 @@ final class ShimmerView: UIView {
     private func setup() {
         backgroundColor = .systemGray5
         clipsToBounds = true
-        
-        // base -> highlight -> base, so the light band sweeps across.
-        gradientLayer.colors = [
-            UIColor.systemGray5.cgColor,
-            UIColor.systemGray6.cgColor,
-            UIColor.systemGray5.cgColor
-        ]
+
+        updateColors()
         gradientLayer.locations = [0.0, 0.5, 1.0]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.5) // horizontal
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
         layer.addSublayer(gradientLayer)
     }
-    
+
+    // CGColors don't follow light/dark mode on their own, so resolve them again on change.
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateColors()
+    }
+
+    private func updateColors() {
+        // base -> highlight -> base, so the light band sweeps across.
+        let base = UIColor.systemGray5.resolvedColor(with: traitCollection).cgColor
+        let highlight = UIColor.systemGray6.resolvedColor(with: traitCollection).cgColor
+        gradientLayer.colors = [base, highlight, base]
+    }
+
     override func layoutSubviews() {
         super.layoutSubviews()
         gradientLayer.frame = bounds // layers ignore Auto Layout
